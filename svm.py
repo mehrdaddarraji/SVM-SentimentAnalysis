@@ -2,7 +2,7 @@ import pandas as pd
 from pandas import DataFrame
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn import naive_bayes
+from sklearn import svm
 from sklearn.metrics import roc_auc_score
  
 # function to create dataframes for text and sentiment
@@ -65,10 +65,9 @@ X_train, y_train = vectorizer.fit_transform(train_df.reviews), train_df.sentimen
  
 test_df = sentimentDataFrame("lab_test.txt")
 X_test, y_test = vectorizer.transform(test_df.reviews), test_df.sentiments
- 
-''' 
-# train using naive bayes classifier
-clf = naive_bayes.MultinomialNB()
+
+# train using linear support vector classification
+clf = svm.SVC(probability=True, kernel='linear', degree=1, gamma=1)
 clf.fit(X_train, y_train)
  
 # test models accuracy
@@ -80,4 +79,3 @@ comments_vector = vectorizer.transform(comments_df['reviews'])
 comments_df['sentiments'] = clf.predict(comments_vector)
  
 print (comments_df)
-'''
