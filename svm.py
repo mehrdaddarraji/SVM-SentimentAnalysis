@@ -44,7 +44,7 @@ def sentimentDataFrame(filename):
                 reviews.append(review)
                 sentiments.append(1)
             else:
-                for i in range(1):
+                for i in range(7):
                     reviews.append(review)
                     sentiments.append(0)
            
@@ -69,7 +69,6 @@ def text_process(mess):
     return [word for word in nopunc.split() if word.lower() not in stopwords.words('english')]
  
 # TFIDF Vectorizer - used to convert reviews from text to features
-stopset = set(stopwords.words('english'))
 vectorizer = CountVectorizer(analyzer=text_process)
  
 # dataframes for train and test dataset
@@ -89,6 +88,9 @@ print ("Model Accuracy: ", roc_auc_score(y_test, clf.predict_proba(X_test)[:,1])
  
 # import bookings.com comments
 comments_df = pd.read_excel("evaluation_dataset.xlsx", header=None, names=['reviews'])
+lines = comments_df['reviews'].tolist()
+for i in lines:
+    lines[i] = text_process(i)
 comments_vector = vectorizer.transform(comments_df['reviews'])
 comments_df['sentiments'] = clf.predict(comments_vector)
  
