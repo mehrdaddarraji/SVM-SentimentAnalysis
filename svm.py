@@ -69,7 +69,7 @@ def text_process(mess):
     # Now just remove any stopwords
     return [word for word in nopunc.split() if word.lower() not in stopwords.words('english')]
  
-# TFIDF Vectorizer - used to convert reviews from text to features
+# Vectorizer - used to convert reviews from text to features
 vectorizer = CountVectorizer(analyzer=text_process)
  
 # dataframes for train and test dataset
@@ -83,20 +83,15 @@ sm = ADASYN()
 X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
 
 # train using linear support vector classification
-clf = svm.LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
-     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
-     multi_class='ovr', penalty='l2', random_state=0, tol=1e-05, verbose=0)
+clf = svm.LinearSVC()
 clf.fit(X_train_res, y_train_res)
 #clf.fit(X_train, y_train)
-#clf.score(X_train, y_train)
  
 # test models accuracy
 print ("Model Accuracy: ", clf.score(X_test, y_test))
  
 # import bookings.com comments
 comments_df = pd.read_excel("evaluation_dataset.xlsx", header=None, names=['reviews'])
-# lines = comments_df['reviews'].tolist()
-#     lines[i] = text_process(i)
 comments_vector = vectorizer.transform(comments_df['reviews'])
 comments_df['sentiments'] = clf.predict(comments_vector)
  
