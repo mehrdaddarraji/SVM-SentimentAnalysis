@@ -95,6 +95,7 @@ predicted_y = clf.predict(X_test)
 tn, fp, fn, tp = confusion_matrix(y_test, predicted_y).ravel()
 precision_score = tp / (tp + fp)
 recall_score = tp / (tp + fn)
+print ("Precision Score: ", precision_score)
 print ("Recall Score: ", recall_score)
  
 # import bookings.com comments
