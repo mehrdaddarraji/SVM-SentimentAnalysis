@@ -5,6 +5,9 @@ from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import svm
 from sklearn.metrics import roc_auc_score
+from collections import Counter
+from sklearn.datasets import make_classification
+# from imblearn.over_sampling import SMOTE
  
 # function to create dataframes for text and sentiment
 def sentimentDataFrame(filename):
@@ -78,6 +81,12 @@ X_train, y_train = vectorizer.fit_transform(train_df.reviews), train_df.sentimen
 test_df = sentimentDataFrame("lab_test.txt")
 X_test, y_test = vectorizer.transform(test_df.reviews), test_df.sentiments
 
+# X, y = make_classification(n_classes=2, class_sep=2, weights=[0.1, 0.9],
+ #                           n_informative=3, n_redundant=1, flip_y=0,
+ #                           n_features=20, n_clusters_per_class=1, n_samples=1000, 
+ #                           random_state=10)
+ 
+print (len(train_df))
 # train using linear support vector classification
 clf = svm.SVC(probability=True, kernel='linear')
 clf.fit(X_train, y_train)
@@ -88,9 +97,8 @@ print ("Model Accuracy: ", roc_auc_score(y_test, clf.predict_proba(X_test)[:,1])
  
 # import bookings.com comments
 comments_df = pd.read_excel("evaluation_dataset.xlsx", header=None, names=['reviews'])
-lines = comments_df['reviews'].tolist()
-for i in lines:
-    lines[i] = text_process(i)
+# lines = comments_df['reviews'].tolist()
+#     lines[i] = text_process(i)
 comments_vector = vectorizer.transform(comments_df['reviews'])
 comments_df['sentiments'] = clf.predict(comments_vector)
  
