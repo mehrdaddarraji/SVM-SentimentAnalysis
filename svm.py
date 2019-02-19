@@ -2,12 +2,12 @@ import pandas as pd
 import string
 from pandas import DataFrame
 from nltk.corpus import stopwords
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn import svm
 from sklearn.metrics import roc_auc_score
 from collections import Counter
 from sklearn.datasets import make_classification
-# from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import SMOTE
  
 # function to create dataframes for text and sentiment
 def sentimentDataFrame(filename):
@@ -47,9 +47,8 @@ def sentimentDataFrame(filename):
                 reviews.append(review)
                 sentiments.append(1)
             else:
-                for i in range(7):
-                    reviews.append(review)
-                    sentiments.append(0)
+                reviews.append(review)
+                sentiments.append(0)
            
     # creating DataFrame out of text and sentiment
     df = DataFrame({'reviews':reviews, 'sentiments':sentiments})
@@ -81,19 +80,18 @@ X_train, y_train = vectorizer.fit_transform(train_df.reviews), train_df.sentimen
 test_df = sentimentDataFrame("lab_test.txt")
 X_test, y_test = vectorizer.transform(test_df.reviews), test_df.sentiments
 
-# X, y = make_classification(n_classes=2, class_sep=2, weights=[0.1, 0.9],
- #                           n_informative=3, n_redundant=1, flip_y=0,
- #                           n_features=20, n_clusters_per_class=1, n_samples=1000, 
- #                           random_state=10)
- 
-print (len(train_df))
+
+sm = SMOTE(random_state=12, ratio = 1.0)
+X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
+
 # train using linear support vector classification
-clf = svm.SVC(probability=True, kernel='linear')
-clf.fit(X_train, y_train)
+clf = svm.LinearSVC()
+clf.fit(X_train_res, y_train_res)
+#clf.fit(X_train, y_train)
 #clf.score(X_train, y_train)
  
 # test models accuracy
-print ("Model Accuracy: ", roc_auc_score(y_test, clf.predict_proba(X_test)[:,1]))
+print ("Model Accuracy: ", clf.score(X_test, y_test))
  
 # import bookings.com comments
 comments_df = pd.read_excel("evaluation_dataset.xlsx", header=None, names=['reviews'])
