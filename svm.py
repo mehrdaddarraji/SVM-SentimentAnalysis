@@ -7,7 +7,7 @@ from sklearn import svm
 from sklearn.metrics import roc_auc_score
 from collections import Counter
 from sklearn.datasets import make_classification
-from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import SMOTE, ADASYN
  
 # function to create dataframes for text and sentiment
 def sentimentDataFrame(filename):
@@ -39,16 +39,15 @@ def sentimentDataFrame(filename):
         score = int(line[-4])
        
         # get the text
-        if score != 3:
-            review = line[index + 1:-7]
-            #reviews.append(review)
+        review = line[index + 1:-7]
+        #reviews.append(review)
 
-            if score >= 4:
-                reviews.append(review)
-                sentiments.append(1)
-            else:
-                reviews.append(review)
-                sentiments.append(0)
+        if score >= 3:
+            reviews.append(review)
+            sentiments.append(1)
+        else:
+            reviews.append(review)
+            sentiments.append(0)
            
     # creating DataFrame out of text and sentiment
     df = DataFrame({'reviews':reviews, 'sentiments':sentiments})
@@ -80,12 +79,13 @@ X_train, y_train = vectorizer.fit_transform(train_df.reviews), train_df.sentimen
 test_df = sentimentDataFrame("lab_test.txt")
 X_test, y_test = vectorizer.transform(test_df.reviews), test_df.sentiments
 
-
-sm = SMOTE(random_state=12, ratio = 1.0)
+sm = ADASYN()
 X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
 
 # train using linear support vector classification
-clf = svm.LinearSVC()
+clf = svm.LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
+     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+     multi_class='ovr', penalty='l2', random_state=0, tol=1e-05, verbose=0)
 clf.fit(X_train_res, y_train_res)
 #clf.fit(X_train, y_train)
 #clf.score(X_train, y_train)
