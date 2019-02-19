@@ -4,7 +4,7 @@ from pandas import DataFrame
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn import svm
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, confusion_matrix
 from collections import Counter
 from sklearn.datasets import make_classification
 from imblearn.over_sampling import SMOTE, ADASYN
@@ -89,6 +89,13 @@ clf.fit(X_train_res, y_train_res)
  
 # test models accuracy
 print ("Model Accuracy: ", clf.score(X_test, y_test))
+
+
+predicted_y = clf.predict(X_test)
+tn, fp, fn, tp = confusion_matrix(y_test, predicted_y).ravel()
+precision_score = tp / (tp + fp)
+recall_score = tp / (tp + fn)
+print ("Recall Score: ", recall_score)
  
 # import bookings.com comments
 comments_df = pd.read_excel("evaluation_dataset.xlsx", header=None, names=['reviews'])
